@@ -30,30 +30,30 @@ def good(x: str):
 
 def apply(x_crazy: tuple[str, int], rule: str):
     x, crazy = x_crazy
-    if x == 'error': return x
+    if x == 'error': return x, crazy
     elif rule == 'Mirror':
         if x[0] != '-': ans = x + x[::-1]
         else: ans = x + x[:0:-1]
         if len(ans) > 6: ans = 'error'
-        return ans
+        return ans, crazy
     elif rule == '<<':
         ans = x[:-1]
         if ans == '-' or len(ans) == 0: ans = '0'
-        return ans
+        return ans, crazy
     elif rule == 'Shift <':
         if x[0] == '-': sign, ans = '-', x[1:]
         else: sign, ans = '', x
         ans = sign + ans[1:] + ans[0]
         ans = str(int(ans))
         if len(ans) > 6: ans = 'error'
-        return ans
+        return ans, crazy
     elif rule == 'SUM':
         if x[0] == '-': sign, ans = '-', x[1:]
         else: sign, ans = '', x
         ans = sign + str(sum(ord(c) - ord('0') for c in ans))
-        return ans
+        return ans, crazy
     elif rule[:2] in {'+ ', '- ', '* ', 'x ', '/ '}:
-        opr = int(rule[2:])
+        opr = int(rule[2:]) + crazy
         y = int(x)
         if rule[0] == '+': ans = str(y + opr)
         elif rule[0] == '-': ans = str(y - opr)
@@ -63,10 +63,16 @@ def apply(x_crazy: tuple[str, int], rule: str):
             if y == ans * opr: ans = str(ans)
             else: ans = 'error'
         if len(ans) > 6: ans = 'error'
-        return ans
-    elif rule[:3] == '[+] ':
-        # do zaimplementowania
-        pass
+        return ans, crazy
+    elif rule.isnumeric():
+        opr = str(int(rule) + crazy)
+        ans = str(int(x + opr))
+        if len(ans) > 6: ans = 'error'
+        return ans, crazy
+    elif rule[:4] == '[+] ':
+        opr = int(rule[4:])
+        crazy += opr
+        return x, crazy
 
 door = dict()
 q = deque()
@@ -74,22 +80,31 @@ q = deque()
 door[(start, 0)] = ('OK', None)
 q.append((start, 0))
 
+#wierzchołki w grafie są postaci krotki (liczba, crazy)
+
+wanna_break = False
 while len(q) > 0:
-    x, crazy = q.popleft()
-    if x == goal: break
+    u = q.popleft()
+    if u[0] == goal: break
 
     for b in buttons:
-        y, crazy2 = apply((x, crazy), b)
-        #if type(y) == NoneType:
-        #    print(x, b)
-        if y in door: continue
-        door[y] = b, x
-        q.append(y)
+        v = apply(u, b)
+        if v in door: continue
+        door[v] = b, u
+        q.append(v)
+        if v[0] == goal:
+            wanna_break = True
+            break
+    if wanna_break: break
 
 path = []
 x = goal
-while x != start:
-    b, x = door[x]
+crz = 0
+while (x, crz) not in door: crz += 1
+u = (x, crz)
+#print(u)
+while u != (start, 0):
+    b, u = door[u]
     path.append(b)
 
 path = path[::-1]
