@@ -31,8 +31,23 @@ def apply(x: str, rule: str):
     elif rule == 'Mirror':
         if x[0] != '-': ans = x + x[::-1]
         else: ans = x + x[:0:-1]
-        if len(ans) > 6: return 'error'
+        if len(ans) > 6: ans = 'error'
         return ans
     elif rule == '<<':
         ans = x[:-1]
-        
+        if ans == '-' or len(ans) == 0: ans = '0'
+        return ans
+    elif rule[:2] in {'+ ', '- ', '* ', '/ '}:
+        opr = int(rule[2:])
+        y = int(x)
+        if rule[0] == '+': ans = str(y + opr)
+        elif rule[0] == '-': ans = str(y - opr)
+        elif rule[0] == '*': ans = str(y * opr)
+        elif rule[0] == '/':
+            ans = y // opr
+            if y == ans * opr: ans = str(ans)
+            else: ans = 'error'
+        if len(ans) > 6: ans = 'error'
+        return ans
+
+
