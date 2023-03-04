@@ -135,6 +135,14 @@ def apply_np(x_crazy: tuple[str, int, str], rule: str):
         else: sign, ans = '', x
         ans = sign + ''.join(chr((10 - (ord(c) - ord('0'))) % 10 + ord('0')) for c in ans)
         return ans, crazy, store
+    elif rule == 'x^2':
+        ans = str(int(x) ** 2)
+        if len(ans) > 6: ans = 'error'
+        return ans, crazy, store
+    elif rule == 'x^3':
+        ans = str(int(x) ** 3)
+        if len(ans) > 6: ans = 'error'
+        return ans, crazy, store
 
 def apply(x_crazy: tuple[str, int, str], rule: str):
     x, crazy, store = apply_np(x_crazy, rule)
