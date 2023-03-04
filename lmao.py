@@ -59,5 +59,6 @@ print(text)
 # co ten program musi wypluć:
 # - Wartość początkowa
 # - Wartość końcowa
+# - Układ portali (jeśli są portale)
 # - Liczba przycisków
 # - Poszczególne przyciski
